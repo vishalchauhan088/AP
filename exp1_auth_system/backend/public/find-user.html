@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Users</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        width: 50%;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+      }
+      .form-group {
+        margin: 10px 0;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+      }
+      button {
+        padding: 10px 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Find Users</h1>
+      <form action="/v1/api/find-users" method="GET">
+        <div class="form-group">
+          <label for="search">Search for Users:</label>
+          <input type="text" id="search" name="search" />
+        </div>
+        <button type="submit">Search</button>
+      </form>
+
+      <div id="userList">
+        <!-- List of users will be rendered here -->
+      </div>
+    </div>
+  </body>
+</html>

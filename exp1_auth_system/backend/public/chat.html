@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <style>
+      /* Existing styles */
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        width: 50%;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+      }
+      .chat-box {
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 300px;
+        overflow-y: scroll;
+      }
+      .form-group {
+        margin: 10px 0;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+      }
+      button {
+        padding: 10px 20px;
+      }
+      .search-results {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px 0;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Chat with <span id="chatUserName">User</span></h1>
+
+      <!-- Search Box -->
+      <div class="form-group">
+        <input type="text" id="userSearch" placeholder="Search for users..." />
+        <div id="searchResults" class="search-results"></div>
+      </div>
+
+      <!-- Chat Box -->
+      <div class="chat-box" id="chatBox"></div>
+
+      <!-- Message Input -->
+      <div class="form-group">
+        <input type="text" id="messageInput" placeholder="Type a message..." />
+        <button id="sendMessageBtn">Send</button>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      // Search for users
+      document
+        .getElementById("userSearch")
+        .addEventListener("input", function () {
+          const query = this.value;
+          if (query) {
+            socket.emit("searchUsers", query);
+          } else {
+            document.getElementById("searchResults").innerHTML = "";
+          }
+        });
+
+      // Display search results
+      socket.on("searchResults", (users) => {
+        const searchResults = document.getElementById("searchResults");
+        searchResults.innerHTML = "";
+        users.forEach((user) => {
+          const userElement = document.createElement("div");
+          userElement.textContent = user.username;
+          userElement.style.cursor = "pointer";
+          userElement.addEventListener("click", () => startChat(user.id));
+          searchResults.appendChild(userElement);
+        });
+      });
+
+      // Start chat
+      function startChat(userId) {
+        socket.emit("startChat", { recipientId: userId });
+        document.getElementById("chatUserName").textContent = "User " + userId; // Update chat header
+      }
+
+      // Send message
+      document
+        .getElementById("sendMessageBtn")
+        .addEventListener("click", () => {
+          const message = document.getElementById("messageInput").value;
+          const chatId = "currentChatId"; // Update this with the actual chatId
+          socket.emit("sendMessage", {
+            senderId: "userId",
+            recipientId: "recipientId", // Update this with the actual recipientId
+            content: message,
+            chatId,
+          });
+          document.getElementById("messageInput").value = "";
+        });
+
+      // Receive message
+      socket.on("receiveMessage", (message) => {
+        const chatBox = document.getElementById("chatBox");
+        chatBox.innerHTML += `<p>${message.senderId}: ${message.content}</p>`;
+      });
+    </script>
+  </body>
+</html>
